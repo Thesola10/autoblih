@@ -15,8 +15,8 @@ __validate()
     # Oh non, des regex ! Go regex101.com pour décoder ce qu'ils font.
 
     grep -E "^([a-zA-Z0-9_.-]+)$" <<< "$1" && \
-    grep -E "^([a-zA-Z0-9_./-]+)$" <<< "$2" && \
-    grep -E "^((([a-zA-Z0-9_.\@\-]+):([rwa]+))(,(([a-zA-Z0-9_.\@\-]+):([rwa]+)))*)$" <<< "$3"
+    grep -E "^([a-zA-Z0-9_.\\/-]+)$" <<< "$2" && \
+    grep -E "^((([a-zA-Z0-9_.@-]+):([rwa]+))(,(([a-zA-Z0-9_.@-]+):([rwa]+)))*)$" <<< "$3"
 }
 
 # Run an autoblih line once

@@ -1,0 +1,76 @@
+#!/bin/bash
+# AutoBlih (c) Karim Vergnes <karim.vergnes@epitech.eu>
+# Not yet licensed for public use
+# Requires blih
+
+if ! which git > /dev/null 2>&1 || ! which blih > /dev/null 2>&1
+then
+    echo "This program requires Blih and Git to be installed. Ask an AER for help."
+    exit 3
+fi
+
+# Check the validity of an autoblih line
+__validate()
+{
+    # Oh non, des regex ! Go regex101.com pour décoder ce qu'ils font.
+
+    grep -E "^([a-zA-Z0-9_.-]+)$" <<< "$1" && \
+    grep -E "^([a-zA-Z0-9_.-]+)$" <<< "$2" && \
+    grep -E "^((([a-zA-Z0-9_.\@\-]+):([rwa]+))(,(([a-zA-Z0-9_.\@\-]+):([rwa]+)))*)$" <<< "$3"
+}
+
+# Run an autoblih line once
+__execute()
+{
+    IFS=',' read -ra acllist <<< "$3"
+    
+    blih -u $BLIHUSER $BLIHFLAGS repository create "$1"
+
+    for acl in $acllist
+    do
+        blih -u $BLIHUSER $BLIHFLAGS repository setacl "$1" "${acl%%:*}" "${acl##*:}"
+    done
+    echo "Created repo $1."
+
+    git clone "git@git.epitech.eu:/$BLIHUSER/$1" "$2/$1"
+    echo "Cloned repo $1 into $2/$1."
+}
+
+# Print help
+__help()
+{
+    echo "== AutoBlih. (c) Karim Vergnes <karim.vergnes@epitech.eu> =="
+    echo
+    echo "autoblih is used this way:"
+    echo "autoblih <user> [<repo name> <dir to clone into|.> <user:acl[,user2:acl2]...>]"
+    echo "Without the optional args, autoblih runs all lines in a file named 'Blihfile' in"
+    echo " the current directory, in the same format as the arguments above."
+    echo
+    echo "This is just a wrapper script around blih and git. Set env vars BLIHFLAGS"
+    echo " and GITFLAGS to add arguments to their respective commands."
+}
+
+##############################
+
+if [[ $# == 1 ]]
+then
+    [ ! -f Blihfile ] && { echo "No Blihfile found. Run autoblih without args for help."; exit 1; }
+    
+    BLIHUSER=$1
+    shift 1
+
+    while read -r line
+    do
+        __validate $line >/dev/null 2>&1 || { echo "Invalid syntax in Blihfile. Run autoblih without args for help."; exit 2; }
+        __execute $line
+    done < Blihfile
+elif [[ $# == 4 ]]
+then
+    BLIHUSER=$1
+    shift 1
+
+    __validate "$@" >/dev/null 2>&1 || { __help; exit 2; }
+    __execute "$@"
+else
+    __help
+fi

@@ -36,6 +36,13 @@ the following on `my.user@epitech.eu`'s account:
 
 There is no limit to the number of lines, or the number of ACL for each line.
 
+### Environment variables
+
+AutoBlih's behavior can be configured using environment variables. The following variables are read:
+
+- `BLIHFLAGS` - Arguments to be added to calls to `blih`, such as your token.
+- `GITFLAGS` - Arguments to be added to `git clone`.
+
 ## Requirements
 
 - `git` to clone the repository once created

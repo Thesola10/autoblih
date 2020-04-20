@@ -22,11 +22,11 @@ __validate()
 # Run an autoblih line once
 __execute()
 {
-    IFS=',' read -ra acllist <<< "$3"
-    
     blih -u $BLIHUSER $BLIHFLAGS repository create "$1"
 
-    for acl in $acllist
+    local IFS=','
+    local acllist=($3)
+    for acl in "${acllist[@]}"
     do
         blih -u $BLIHUSER $BLIHFLAGS repository setacl "$1" "${acl%%:*}" "${acl##*:}"
     done

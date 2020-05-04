@@ -24,8 +24,7 @@ __execute()
 {
     blih -u $BLIHUSER $BLIHFLAGS repository create "$1"
 
-    IFS=',' local acllist=($3)
-    for acl in "${acllist[@]}"
+    tr ',' '\n' <<< "$3" | while read acl
     do
         blih -u $BLIHUSER $BLIHFLAGS repository setacl "$1" "${acl%%:*}" "${acl##*:}"
     done
